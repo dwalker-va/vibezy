@@ -56,3 +56,40 @@ type DeactivateUserResponse struct {
 	IsSuccess    bool   `json:"isSuccess"`
 	ErrorMessage string `json:"errorMessage"`
 }
+
+type ListGroupsResponse struct {
+	IsSuccess    bool   `json:"isSuccess"`
+	ErrorMessage string `json:"errorMessage"`
+	Data         struct {
+		GroupCount int `json:"groupCount"`
+		Groups     []struct {
+			ID           string `json:"id"`
+			Name         string `json:"name"`
+			UserCount    int    `json:"userCount"`
+			ManagerCount int    `json:"managerCount"`
+		} `json:"groups"`
+	} `json:"data"`
+}
+
+type GetGroupResponse struct {
+	IsSuccess    bool   `json:"isSuccess"`
+	ErrorMessage string `json:"errorMessage"`
+	Data         struct {
+		ID           string `json:"id"`
+		Name         string `json:"name"`
+		UserCount    int    `json:"userCount"`
+		ManagerCount int    `json:"managerCount"`
+		Users        []struct {
+			Email            string   `json:"email"`
+			FistName         string   `json:"fistName"`
+			LastName         string   `json:"lastName"`
+			UserName         string   `json:"userName"`
+			JobTitle         string   `json:"jobTitle"`
+			IsGroupManager   bool     `json:"isGroupManager"`
+			IsCompanyManager bool     `json:"isCompanyManager"`
+			IsAdmin          bool     `json:"isAdmin"`
+			ManagedGroups    []string `json:"managedGroups"`
+			MemberGroups     []string `json:"memberGroups"`
+		} `json:"users"`
+	} `json:"data"`
+}

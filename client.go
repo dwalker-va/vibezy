@@ -73,7 +73,7 @@ func (c *Client) Ping(ctx context.Context) (*PingResponse, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 || !r.IsSuccess {
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
 		return r, apiError(resp.StatusCode, r.ErrorMessage)
 	}
 
@@ -113,7 +113,7 @@ func (c *Client) GetUser(ctx context.Context, email string) (*GetUserResponse, e
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 || !r.IsSuccess {
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
 		return nil, apiError(resp.StatusCode, r.ErrorMessage)
 	}
 
@@ -134,7 +134,7 @@ func (c *Client) UpdateUser(ctx context.Context, email string) (*UpdateUserRespo
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 || !r.IsSuccess {
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
 		return nil, apiError(resp.StatusCode, r.ErrorMessage)
 	}
 
@@ -155,6 +155,46 @@ func (c *Client) DeactivateUser(ctx context.Context, request DeactivateUserReque
 	}
 
 	r := &DeactivateUserResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// ListGroups calls the OfficeVibe v2 groups:list API.
+func (c *Client) ListGroups(ctx context.Context) (*ListGroupsResponse, error) {
+	req, err := c.buildRequest(ctx, http.MethodGet, "groups", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &ListGroupsResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// GetGroup calls the OfficeVibe v2 groups:get API.
+func (c *Client) GetGroup(ctx context.Context, groupID string) (*GetGroupResponse, error) {
+	req, err := c.buildRequest(ctx, http.MethodGet, fmt.Sprintf("groups/?groupId=%s", groupID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &GetGroupResponse{}
 	resp, err := c.doRequest(req, r)
 	if err != nil {
 		return nil, err
