@@ -1,6 +1,7 @@
 package vibezy
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -23,6 +24,10 @@ func NewClient(apiKey string) *Client {
 	}
 }
 
+func apiError(status int, message string) error {
+	return fmt.Errorf("OfficeVibe error: status: `%d`, message: `%s`", status, message)
+}
+
 // Client communicates with the OfficeVibe v2 API over HTTP using JSON
 // You should use the `NewClient` constructor to create a new instance of this struct
 type Client struct {
@@ -40,32 +45,124 @@ func (c *Client) buildRequest(ctx context.Context, method, path string, body io.
 	return req, nil
 }
 
-// Ping calls the OfficeVibe v2 Ping API.
-// This is useful to test whether your configuration (including apiKey) is working correctly.
-func (c *Client) Ping(ctx context.Context) error {
-	req, err := c.buildRequest(ctx, http.MethodGet, "ping", nil)
-	if err != nil {
-		return err
-	}
+func (c *Client) doRequest(req *http.Request, format interface{}) (*http.Response, error) {
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	type Response struct {
-		IsSuccess    bool   `json:"isSuccess"`
-		ErrorMessage string `json:"errorMessage"`
-	}
-
-	r := Response{}
-	err = json.NewDecoder(resp.Body).Decode(&r)
+	err = json.NewDecoder(resp.Body).Decode(format)
 	if err != nil {
-		return fmt.Errorf("%s, %w", decodingErrorHint, err)
+		return nil, fmt.Errorf("%s, %w", decodingErrorHint, err)
+	}
+
+	return resp, nil
+}
+
+// Ping calls the OfficeVibe v2 Ping API.
+// This is useful to test whether your configuration (including apiKey) is working correctly.
+func (c *Client) Ping(ctx context.Context) (*PingResponse, error) {
+	req, err := c.buildRequest(ctx, http.MethodGet, "ping", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &PingResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
 	}
 
 	if resp.StatusCode != 200 || !r.IsSuccess {
-		return fmt.Errorf("OfficeVibe error message: %s", r.ErrorMessage)
+		return r, apiError(resp.StatusCode, r.ErrorMessage)
 	}
 
-	return nil
+	return r, nil
+}
+
+// ListUsers calls the OfficeVibe v2 users:list API.
+func (c *Client) ListUsers(ctx context.Context) (*ListUsersResponse, error) {
+	req, err := c.buildRequest(ctx, http.MethodGet, "users", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &ListUsersResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// GetUser calls the OfficeVibe v2 users:get API.
+func (c *Client) GetUser(ctx context.Context, email string) (*GetUserResponse, error) {
+	req, err := c.buildRequest(ctx, http.MethodGet, fmt.Sprintf("users/%s", email), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &GetUserResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// Update calls the OfficeVibe v2 users:update API.
+// If a user does not already exist, they will be created and receive an invitation.
+func (c *Client) UpdateUser(ctx context.Context, email string) (*UpdateUserResponse, error) {
+	req, err := c.buildRequest(ctx, http.MethodGet, fmt.Sprintf("users/%s", email), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &UpdateUserResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// Update calls the OfficeVibe v2 users:update API.
+// If a user does not already exist, they will be created and receive an invitation.
+func (c *Client) DeactivateUser(ctx context.Context, request DeactivateUserRequest) (*DeactivateUserResponse, error) {
+	body, err := json.Marshal(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.buildRequest(ctx, http.MethodGet, "users/deactivate", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	r := &DeactivateUserResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
 }
