@@ -2,39 +2,32 @@ package vibezy
 
 import (
 	"context"
-	"errors"
-	"os"
+	"net/http"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-func TestClient_Ping(t *testing.T) {
-	cases := []struct {
-		apiKey      string
-		description string
-		want        error
-	}{
-		{
-			apiKey:      os.Getenv("OFFICEVIBE_API_KEY"),
-			description: "Returns no error with working API Key",
-			want:        nil,
-		},
-		{
-			apiKey:      "brokenApiKey",
-			description: "Returns expected error with broken API Key",
-			want:        errors.New("could not decode OfficeVibe response, have you tested whether your API key is set up correctly?: https://api.officevibe.com/docs/ping"),
-		},
+func TestClient_SetsRequestHeaders(t *testing.T) {
+	// arrange
+	c := NewClient("t3stT0K3n")
+
+	// act
+	r, err := c.buildRequest(context.Background(), http.MethodGet, "path", nil)
+	if err != nil {
+		t.Errorf("received unexpected error: %s", err.Error())
 	}
 
-	for _, c := range cases {
-		t.Run(c.description, func(t *testing.T) {
-			client := NewClient(c.apiKey)
-			got := client.Ping(context.Background())
-			if diff := cmp.Diff(c.want, got, cmpopts.EquateErrors()); diff != "" {
-				t.Errorf("Client.Ping() mismatch (-want +got):\n%s", diff)
-			}
-		})
+	// assert
+	want := "application/json"
+	got := r.Header.Get("content-type")
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("header mismatch (-want +got):\n%s", diff)
+	}
+
+	want = "Bearer t3stT0K3n"
+	got = r.Header.Get("Authorization")
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("header mismatch (-want +got):\n%s", diff)
 	}
 }
