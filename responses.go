@@ -118,3 +118,8 @@ type RemoveAllUsersFromGroupResponse struct {
 	IsSuccess    bool   `json:"isSuccess"`
 	ErrorMessage string `json:"errorMessage"`
 }
+
+type SyncResponse struct {
+	IsSuccess bool     `json:"isSuccess"`
+	Errors    []string `json:"errors"`
+}

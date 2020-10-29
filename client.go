@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -289,7 +290,7 @@ func (c *Client) RemoveUsersFromGroup(ctx context.Context, request RemoveUsersFr
 		return nil, err
 	}
 
-	req, err := c.buildRequest(ctx, http.MethodPost, "groups/addUsers", bytes.NewBuffer(body))
+	req, err := c.buildRequest(ctx, http.MethodPost, "groups/removeUsers", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +315,7 @@ func (c *Client) RemoveAllUsersFromGroup(ctx context.Context, request RemoveAllU
 		return nil, err
 	}
 
-	req, err := c.buildRequest(ctx, http.MethodPost, "groups/addUsers", bytes.NewBuffer(body))
+	req, err := c.buildRequest(ctx, http.MethodPost, "groups/removeAllUsers", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -327,6 +328,31 @@ func (c *Client) RemoveAllUsersFromGroup(ctx context.Context, request RemoveAllU
 
 	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
 		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// RemoveAllUsersFromGroup calls the OfficeVibe v2 group:removeAllUsers API.
+func (c *Client) Sync(ctx context.Context, request SyncRequest) (*SyncResponse, error) {
+	body, err := json.Marshal(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.buildRequest(ctx, http.MethodPost, "sync", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	r := &SyncResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, strings.Join(r.Errors, ", "))
 	}
 
 	return r, err
