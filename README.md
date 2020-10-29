@@ -14,7 +14,7 @@ Use `go get` to install the vibezy Golang module:
 
 Include vibezy in your application:
 
-`import "github.com/spf13/cobra"`
+`import "github.com/dwalker-va/vibezy"`
 
 ## Usage
 Vibezy offers an RPC Client with Request and Response structs to give you full control over how you interact with OfficeVibe's API.
