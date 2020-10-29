@@ -123,7 +123,7 @@ func (c *Client) GetUser(ctx context.Context, email string) (*GetUserResponse, e
 // Update calls the OfficeVibe v2 users:update API.
 // If a user does not already exist, they will be created and receive an invitation.
 func (c *Client) UpdateUser(ctx context.Context, email string) (*UpdateUserResponse, error) {
-	req, err := c.buildRequest(ctx, http.MethodGet, fmt.Sprintf("users/%s", email), nil)
+	req, err := c.buildRequest(ctx, http.MethodPost, fmt.Sprintf("users/%s", email), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (c *Client) DeactivateUser(ctx context.Context, request DeactivateUserReque
 		return nil, err
 	}
 
-	req, err := c.buildRequest(ctx, http.MethodGet, "users/deactivate", bytes.NewBuffer(body))
+	req, err := c.buildRequest(ctx, http.MethodPost, "users/deactivate", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -201,6 +201,131 @@ func (c *Client) GetGroup(ctx context.Context, groupID string) (*GetGroupRespons
 	}
 
 	if resp.StatusCode != 200 || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// CreateGroup calls the OfficeVibe v2 group:create API.
+func (c *Client) CreateGroup(ctx context.Context, request CreateGroupRequest) (*CreateGroupResponse, error) {
+	body, err := json.Marshal(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.buildRequest(ctx, http.MethodPost, "groups", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	r := &CreateGroupResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// RemoveGroup calls the OfficeVibe v2 group:remove API.
+func (c *Client) RemoveGroup(ctx context.Context, request RemoveGroupRequest) (*RemoveGroupResponse, error) {
+	body, err := json.Marshal(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.buildRequest(ctx, http.MethodPost, "groups/remove", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	r := &RemoveGroupResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// AddUsersToGroup calls the OfficeVibe v2 group:addUsers API.
+func (c *Client) AddUsersToGroup(ctx context.Context, request AddUsersToGroupRequest) (*AddUsersToGroupResponse, error) {
+	body, err := json.Marshal(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.buildRequest(ctx, http.MethodPost, "groups/addUsers", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	r := &AddUsersToGroupResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// RemoveUsersFromGroup calls the OfficeVibe v2 group:removeUsers API.
+func (c *Client) RemoveUsersFromGroup(ctx context.Context, request RemoveUsersFromGroupRequest) (*RemoveUsersFromGroupResponse, error) {
+	body, err := json.Marshal(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.buildRequest(ctx, http.MethodPost, "groups/addUsers", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	r := &RemoveUsersFromGroupResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
+		return nil, apiError(resp.StatusCode, r.ErrorMessage)
+	}
+
+	return r, err
+}
+
+// RemoveAllUsersFromGroup calls the OfficeVibe v2 group:removeAllUsers API.
+func (c *Client) RemoveAllUsersFromGroup(ctx context.Context, request RemoveAllUsersFromGroupRequest) (*RemoveAllUsersFromGroupResponse, error) {
+	body, err := json.Marshal(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.buildRequest(ctx, http.MethodPost, "groups/addUsers", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	r := &RemoveAllUsersFromGroupResponse{}
+	resp, err := c.doRequest(req, r)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK || !r.IsSuccess {
 		return nil, apiError(resp.StatusCode, r.ErrorMessage)
 	}
 

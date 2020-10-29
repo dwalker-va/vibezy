@@ -93,3 +93,28 @@ type GetGroupResponse struct {
 		} `json:"users"`
 	} `json:"data"`
 }
+
+type CreateGroupResponse struct {
+	IsSuccess    bool   `json:"isSuccess"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
+type RemoveGroupResponse struct {
+	IsSuccess    bool   `json:"isSuccess"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
+type AddUsersToGroupResponse struct {
+	IsSuccess    bool   `json:"isSuccess"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
+type RemoveUsersFromGroupResponse struct {
+	IsSuccess    bool   `json:"isSuccess"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
+type RemoveAllUsersFromGroupResponse struct {
+	IsSuccess    bool   `json:"isSuccess"`
+	ErrorMessage string `json:"errorMessage"`
+}
