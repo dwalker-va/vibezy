@@ -1,5 +1,7 @@
 # vibezy
 Golang OfficeVibe SDK
 
-## Run tests
-`OFFICEVIBE_API_KEY=<Your API key> go test *.go`
+![status](https://github.com/dwalker-va/vibezy/workflows/Go/badge.svg)
+
+## Contributing
+[see CONTRIBUTING.md](CONTRIBUTING.md)
