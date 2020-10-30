@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	url = "https://app.officevibe.com/api/v2"
+	baseURL = "https://app.officevibe.com/api/v2"
 
 	//OfficeVibe's API returns an entire HTML login page if your apiKey is wrong, which will cause this error
 	decodingErrorHint = "could not decode OfficeVibe response, have you tested whether your API key is set up correctly?: https://api.officevibe.com/docs/ping"
@@ -20,8 +20,9 @@ const (
 // NewClient returns a client for interacting with the OfficeVibe v2 API
 func NewClient(apiKey string) *Client {
 	return &Client{
-		apiKey: apiKey,
-		http:   &http.Client{},
+		apiKey:  apiKey,
+		baseURL: baseURL,
+		http:    &http.Client{},
 	}
 }
 
@@ -32,12 +33,13 @@ func apiError(status int, message string) error {
 // Client communicates with the OfficeVibe v2 API over HTTP using JSON
 // You should use the `NewClient` constructor to create a new instance of this struct
 type Client struct {
-	apiKey string
-	http   *http.Client
+	apiKey  string
+	baseURL string
+	http    *http.Client
 }
 
 func (c *Client) buildRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, method, fmt.Sprintf("%s/%s", url, path), body)
+	req, err := http.NewRequestWithContext(ctx, method, fmt.Sprintf("%s/%s", c.baseURL, path), body)
 	if err != nil {
 		return nil, err
 	}
