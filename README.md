@@ -1,7 +1,7 @@
 # vibezy
-![license](https://img.shields.io/github/license/dwalker-va/vibezy)
+![license](https://img.shields.io/github/license/vendasta/vibezy)
 
-![status](https://github.com/dwalker-va/vibezy/workflows/Go/badge.svg)
+![status](https://github.com/vendasta/vibezy/workflows/Go/badge.svg)
 
 A simple Golang SDK for the [OfficeVibe API](https://api.officevibe.com/docs). 
 
@@ -10,11 +10,11 @@ This is not maintained by OfficeVibe.
 ## Installing
 Use `go get` to install the vibezy Golang module:
 
-`go get github.com/dwalker-va/vibezy`
+`go get github.com/vendasta/vibezy`
 
 Include vibezy in your application:
 
-`import "github.com/dwalker-va/vibezy"`
+`import "github.com/vendasta/vibezy"`
 
 ## Usage
 Vibezy offers an RPC Client with Request and Response structs to give you full control over how you interact with OfficeVibe's API.
@@ -43,6 +43,6 @@ All API calls accept a `context.Context` and support context control, such as ca
 This project follows [Semantic Versioning 2.0.0](http://semver.org/) guidelines.
 
 ## Contributing
-Check out the [roadmap](https://github.com/dwalker-va/vibezy/issues/3)
+Check out the [roadmap](https://github.com/vendasta/vibezy/issues/3)
 
 Want to contribute? [see CONTRIBUTING.md](CONTRIBUTING.md)
